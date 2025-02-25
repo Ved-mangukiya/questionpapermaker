@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e1e2e">
+    <title>Question Paper Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1e1e2e;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 100%;
+            margin: auto;
+            background: #2e2e3e;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        input, button, select, textarea {
+            width: 90%;
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        button {
+            background: #ff6600;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #ff4500;
+        }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            color: black;
+            margin-bottom: 20px;
+        }
+        .header-table th, .header-table td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        #question-preview {
+            background: white;
+            color: black;
+            padding: 20px;
+            text-align: left;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .question-container {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .question-container img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Question Paper Generator</h1>
+        <h2>SHREE SWAMINARAYAN GURUKUL SURAT</h2>
+        <p>Dabholi - Kadodara Road, Surat, Gujarat - 395004</p>
+
+        <label>Subject:</label> <input type="text" id="subject"><br>
+        <label>Chapter:</label> <input type="text" id="chapter"><br>
+        <label>Marks:</label> <input type="number" id="marks"><br>
+        <label>Duration:</label> <input type="text" id="duration"><br>
+        <label>Exam Date:</label> <input type="date" id="examDate"><br>
+
+        <label>Paper Type:</label>
+        <select id="paperType">
+            <option value="short">Short/Long Questions</option>
+            <option value="mcq">MCQs</option>
+        </select><br>
+
+        <label>Upload PNG/JPG Questions:</label> 
+        <input type="file" id="file-input" multiple accept=".png, .jpg, .jpeg"><br>
+
+        <label>Enter Text Question:</label>
+        <textarea id="text-question" rows="3" placeholder="Type your question here..."></textarea><br>
+        <button onclick="addTextQuestion()">Add Question</button>
+
+        <button onclick="generateQuestionPaper()">Generate</button>
+        <button onclick="downloadPDF()">Download PDF</button>
+        <button onclick="downloadPNG()">Download PNG</button>
+
+        <p>Total Questions: <span id="question-count">0</span></p>
+    </div>
+    
+    <div id="question-preview"></div>
+
+    <script>
+        let questions = [];
+
+        function addTextQuestion() {
+            let text = document.getElementById("text-question").value;
+            let paperType = document.getElementById("paperType").value;
+            if (text.trim() !== "") {
+                let options = paperType === "mcq" ? ["A: _______", "B: _______", "C: _______", "D: _______"] : [];
+                questions.push({ type: "text", question: text, options });
+                document.getElementById("text-question").value = "";
+                updateQuestionCount();
+            }
+        }
+
+        document.getElementById("file-input").addEventListener("change", function(event) {
+            let files = event.target.files;
+            for (let file of files) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    questions.push({ type: "image", src: e.target.result });
+                    updateQuestionCount();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function updateQuestionCount() {
+            document.getElementById("question-count").textContent = questions.length;
+        }
+
+        function generateQuestionPaper() {
+            let preview = document.getElementById("question-preview");
+            preview.innerHTML = "";
+
+            let subject = document.getElementById("subject").value;
+            let chapter = document.getElementById("chapter").value;
+            let marks = document.getElementById("marks").value;
+            let duration = document.getElementById("duration").value;
+            let examDate = document.getElementById("examDate").value;
+
+            preview.innerHTML += `<table class='header-table'><tr><th>School</th><th>Subject</th><th>Chapter</th><th>Marks</th><th>Duration</th><th>Date</th></tr>
+                                  <tr><td>SHREE SWAMINARAYAN GURUKUL SURAT</td><td>${subject}</td><td>${chapter}</td><td>${marks}</td><td>${duration}</td><td>${examDate}</td></tr></table>`;
+            
+            questions.forEach((q, index) => {
+                let optionsHTML = q.options ? `<p>${q.options.join(" &nbsp; ")}</p>` : "";
+                if (q.type === "image") {
+                    preview.innerHTML += `<div class='question-container'><b>Q${index + 1}.</b><br><img src="${q.src}"></div>${optionsHTML}`;
+                } else {
+                    preview.innerHTML += `<div class='question-container'><b>Q${index + 1}.</b> ${q.question}</div>${optionsHTML}`;
+                }
+            });
+        }
+
+        function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    let pdf = new jsPDF("p", "mm", "a4");
+    let element = document.getElementById("question-preview");
+
+    // Convert the element to a canvas
+    html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+        let imgData = canvas.toDataURL("image/png");
+        let imgWidth = 190; // A4 width minus margins
+        let pageHeight = 297; // A4 height in mm
+        let imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 10; // Start position
+
+        // Add first page
+        pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // If content overflows, add new pages
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+
+        // Save PDF
+        pdf.save("question_paper.pdf");
+    });
+}
+
+
+
+        function downloadPNG() {
+            html2canvas(document.getElementById("question-preview"), { scale: 2 }).then(canvas => {
+                canvas.toBlob(blob => {
+                    saveAs(blob, "question_paper.png");
+                });
+            });
+        }
+    </script>
+</body>
+</html>
