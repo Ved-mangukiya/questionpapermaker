@@ -8,200 +8,1448 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary: #7b68ee;
+            --primary-dark: #6a5acd;
+            --secondary: #ff6b6b;
+            --secondary-dark: #ff5252;
+            --bg-dark: #1a1a2e;
+            --bg-light: #242438;
+            --text-light: #f5f5f5;
+            --text-dim: #b3b3cc;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --info: #2196f3;
+        }
+        
+        * {
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+        
         body {
-            font-family: 'Arial', sans-serif;
-            background: #1e1e2e;
-            color: white;
-            text-align: center;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
         }
+        
+        header {
+            background: var(--primary);
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        
         .container {
-            max-width: 100%;
-            margin: auto;
-            background: #2e2e3e;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
-        input, button, select, textarea {
-            width: 90%;
-            margin: 5px;
-            padding: 10px;
+        
+        .main-container {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        
+        h1, h2 {
+            text-align: center;
+            margin: 0;
+            padding: 10px 0;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+        
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+        
+        .copyright {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #3a3a5a;
+            background: #2a2a40;
+            color: var(--text-light);
             font-size: 16px;
-            border-radius: 5px;
+            outline: none;
         }
-        button {
-            background: #ff6600;
-            color: white;
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(123, 104, 238, 0.3);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
             border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(123, 104, 238, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #3d8b40;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        
+        .file-input-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: #2a2a40;
+            border: 2px dashed #3a3a5a;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .file-input-label:hover {
+            border-color: var(--primary);
+            background: #32324a;
+        }
+        
+        .file-input-label i {
+            font-size: 24px;
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
             cursor: pointer;
         }
-        button:hover {
-            background: #ff4500;
-        }
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            color: black;
-            margin-bottom: 20px;
-        }
-        .header-table th, .header-table td {
-            border: 1px solid black;
-            padding: 8px;
+        
+        .stats-container {
+            background: #2a2a40;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
             text-align: center;
         }
-        #question-preview {
-            background: white;
-            color: black;
-            padding: 20px;
-            text-align: left;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 800px;
-            margin: 20px auto;
+        
+        .stat {
+            display: inline-block;
+            margin: 0 15px;
+            font-size: 1.1rem;
         }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-left: 5px;
+        }
+        
+        .question-list {
+            margin-top: 30px;
+        }
+        
         .question-container {
+            background: #2a2a40;
+            border-radius: 10px;
             margin-bottom: 20px;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
+            padding: 15px;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
+        
+        .question-container:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+        
         .question-container img {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
+            max-width: 100%;
             display: block;
             margin: 10px auto;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .question-number {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-right: 8px;
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .btn-group {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-delete {
+            background: var(--danger);
+        }
+        
+        .btn-delete:hover {
+            background: #d32f2f;
+        }
+        
+        .btn-crop {
+            background: var(--info);
+        }
+        
+        .btn-crop:hover {
+            background: #1976d2;
+        }
+        
+        .btn-rotate {
+            background: var(--success);
+        }
+        
+        .btn-rotate:hover {
+            background: #3d8b40;
+        }
+        
+        .btn-move {
+            background: var(--warning);
+            cursor: move;
+        }
+        
+        .btn-move:hover {
+            background: #f57c00;
+        }
+        
+        .crop-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .crop-content {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .crop-title {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+        
+        .crop-image-container {
+            max-height: 60vh;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .crop-image-container img {
+            max-width: 100%;
+        }
+        
+        .crop-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .preview-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+            color: black;
+            display: none;
+        }
+        
+        .paper-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+        
+        .paper-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .paper-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .paper-marks, .paper-time {
+            font-weight: 700;
+        }
+        
+        .paper-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .mcq-option {
+            margin-left: 30px;
+            margin-bottom: 8px;
+        }
+        
+        .paper-question {
+            margin-bottom: 20px;
+        }
+        
+        .paper-question img {
+            max-width: 100%;
+            margin: 10px 0;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+        
+        .btn-drag-handle {
+            opacity: 0.6;
+            cursor: move;
+        }
+        
+        .btn-drag-handle:hover {
+            opacity: 1;
+        }
+        
+        .dragging {
+            opacity: 0.5;
+            border: 2px dashed var(--primary);
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+        
+        .loading-text {
+            color: white;
+            font-size: 1.5rem;
+            margin-left: 15px;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+        }
+        
+        #notification.show {
+            transform: translateY(0);
+            display: block;
+        }
+        
+        .template-container {
+            margin-top: 20px;
+            background: #2a2a40;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .template-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-light);
+        }
+        
+        .template-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .template-btn {
+            background: #3a3a5a;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 15px;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+        
+        .template-btn:hover {
+            background: var(--primary);
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #3a3a5a;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 16px;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
+    <header>
+        <div class="container">
+            <h1>Question Paper Generator</h1>
+            <h2>SHREE SWAMINARAYAN GURUKUL SURAT</h2>
+        </div>
+    </header>
+    
     <div class="container">
-        <h1>Question Paper Generator</h1>
-        <h2>SHREE SWAMINARAYAN GURUKUL SURAT</h2>
-        <p>© 2025 Mangukiya Ved. All rights reserved.</p>
-
-        <label>Subject:</label> <input type="text" id="subject"><br>
-        <label>Chapter:</label> <input type="text" id="chapter"><br>
-        <label>Marks:</label> <input type="number" id="marks"><br>
-        <label>Duration:</label> <input type="text" id="duration"><br>
-        <label>Exam Date:</label> <input type="date" id="examDate"><br>
-
-        <label>Paper Type:</label>
-        <select id="paperType">
-            <option value="short">Short/Long Questions</option>
-            <option value="mcq">MCQs</option>
-        </select><br>
-
-        <label>Upload PNG/JPG Questions:</label> 
-        <input type="file" id="file-input" multiple accept=".png, .jpg, .jpeg"><br>
-
-        <label>Enter Text Question:</label>
-        <textarea id="text-question" rows="3" placeholder="Type your question here..."></textarea><br>
-        <button onclick="addTextQuestion()">Add Question</button>
-
-        <button onclick="generateQuestionPaper()">Generate</button>
-        <button onclick="downloadPDF()">Download PDF</button>
-        <button onclick="downloadPNG()">Download PNG</button>
-
-        <p>Total Questions: <span id="question-count">0</span></p>
+        <div class="main-container">
+            <p class="copyright">© 2025 Mangukiya Ved. All rights reserved.</p>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="setup">Setup Paper</button>
+                <button class="tab" data-tab="questions">Add Questions</button>
+                <button class="tab" data-tab="preview">Preview</button>
+            </div>
+            
+            <div class="tab-content active" id="setup-tab">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="subject">Subject:</label>
+                        <input type="text" id="subject" placeholder="Enter subject name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="chapter">Chapter/Topic:</label>
+                        <input type="text" id="chapter" placeholder="Enter chapter or topic">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="marks">Total Marks:</label>
+                        <input type="number" id="marks" min="1" placeholder="Enter total marks">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duration">Duration:</label>
+                        <input type="text" id="duration" placeholder="e.g., 1 hour 30 minutes">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="examDate">Exam Date:</label>
+                        <input type="date" id="examDate">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="paperType">Paper Type:</label>
+                        <select id="paperType">
+                            <option value="short">Short/Long Questions</option>
+                            <option value="mcq">Multiple Choice Questions (MCQs)</option>
+                            <option value="mixed">Mixed Format</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="template-container">
+                    <div class="template-title">Quick Templates:</div>
+                    <div class="template-options">
+                        <button class="template-btn" onclick="loadTemplate('unit_test')">Unit Test</button>
+                        <button class="template-btn" onclick="loadTemplate('midterm')">Midterm Exam</button>
+                        <button class="template-btn" onclick="loadTemplate('final')">Final Exam</button>
+                        <button class="template-btn" onclick="loadTemplate('quiz')">Quick Quiz</button>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn btn-primary" onclick="switchTab('questions')">
+                        <i class="fas fa-arrow-right"></i> Next: Add Questions
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="questions-tab">
+                <div class="form-group">
+                    <label for="text-question">Enter Text Question:</label>
+                    <textarea id="text-question" placeholder="Type your question here..."></textarea>
+                </div>
+                
+                <div class="form-group" id="mcq-options-container" style="display: none;">
+                    <label>Answer Options:</label>
+                    <div id="mcq-options">
+                        <input type="text" placeholder="Option A" class="mcq-option-input">
+                        <input type="text" placeholder="Option B" class="mcq-option-input">
+                        <input type="text" placeholder="Option C" class="mcq-option-input">
+                        <input type="text" placeholder="Option D" class="mcq-option-input">
+                    </div>
+                    <label for="correct-option">Correct Option:</label>
+                    <select id="correct-option">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="question-marks">Marks for this question:</label>
+                    <input type="number" id="question-marks" min="1" value="1">
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn btn-primary" onclick="addTextQuestion()">
+                        <i class="fas fa-plus"></i> Add Question
+                    </button>
+                </div>
+                
+                <div class="file-input-container">
+                    <label class="file-input-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Upload PNG/JPG Questions
+                        <input type="file" id="file-input" class="file-input" multiple accept=".png, .jpg, .jpeg">
+                    </label>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat">Total Questions: <span id="question-count" class="stat-value">0</span></div>
+                    <div class="stat">Total Marks: <span id="total-marks" class="stat-value">0</span></div>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn btn-secondary" onclick="switchTab('setup')">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button class="btn btn-primary" onclick="switchTab('preview')">
+                        <i class="fas fa-eye"></i> Preview Paper
+                    </button>
+                </div>
+                
+                <div id="question-list" class="question-list">
+                    <!-- Questions will be displayed here -->
+                </div>
+            </div>
+            
+            <div class="tab-content" id="preview-tab">
+                <div class="btn-container">
+                    <button class="btn btn-secondary" onclick="switchTab('questions')">
+                        <i class="fas fa-arrow-left"></i> Back to Questions
+                    </button>
+                    <button class="btn btn-success" onclick="generateQuestionPaper()">
+                        <i class="fas fa-file-alt"></i> Generate Paper
+                    </button>
+                    <button class="btn btn-info" onclick="downloadPDF()">
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </button>
+                    <button class="btn btn-info" onclick="downloadPNG()">
+                        <i class="fas fa-file-image"></i> Download PNG
+                    </button>
+                </div>
+                
+                <div id="paper-preview" class="preview-container">
+                    <!-- Question paper will be generated here -->
+                </div>
+            </div>
+        </div>
     </div>
     
-    <div id="question-preview"></div>
+    <div id="crop-modal" class="crop-modal">
+        <div class="crop-content">
+            <div class="crop-title">Crop Image</div>
+            <div class="crop-image-container">
+                <img id="crop-image">
+            </div>
+            <div class="crop-actions">
+                <button class="btn btn-primary" onclick="saveCroppedImage()">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button class="btn btn-secondary" onclick="closeCrop()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Processing...</div>
+    </div>
+    
+    <div id="notification">Notification message</div>
+    
+    <footer>
+        <p>Question Paper Generator v2.0 | SHREE SWAMINARAYAN GURUKUL SURAT</p>
+    </footer>
 
     <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
         let questions = [];
-
-        function addTextQuestion() {
-            let text = document.getElementById("text-question").value;
-            let paperType = document.getElementById("paperType").value;
-            if (text.trim() !== "") {
-                let options = paperType === "mcq" ? ["A: _______", "B: _______", "C: _______", "D: _______"] : [];
-                questions.push({ type: "text", question: text, options });
-                document.getElementById("text-question").value = "";
-                updateQuestionCount();
-            }
-        }
-
-        document.getElementById("file-input").addEventListener("change", function(event) {
-            let files = event.target.files;
-            for (let file of files) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    questions.push({ type: "image", src: e.target.result });
-                    updateQuestionCount();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        function updateQuestionCount() {
-            document.getElementById("question-count").textContent = questions.length;
-        }
-
-        function generateQuestionPaper() {
-            let preview = document.getElementById("question-preview");
-            preview.innerHTML = "";
-
-            let subject = document.getElementById("subject").value;
-            let chapter = document.getElementById("chapter").value;
-            let marks = document.getElementById("marks").value;
-            let duration = document.getElementById("duration").value;
-            let examDate = document.getElementById("examDate").value;
-
-            preview.innerHTML += `<table class='header-table'><tr><th>School</th><th>Subject</th><th>Chapter</th><th>Marks</th><th>Duration</th><th>Date</th></tr>
-                                  <tr><td>SHREE SWAMINARAYAN GURUKUL SURAT</td><td>${subject}</td><td>${chapter}</td><td>${marks}</td><td>${duration}</td><td>${examDate}</td></tr></table>`;
-            
-            questions.forEach((q, index) => {
-                let optionsHTML = q.options ? `<p>${q.options.join(" &nbsp; ")}</p>` : "";
-                if (q.type === "image") {
-                    preview.innerHTML += `<div class='question-container'><b>Q${index + 1}.</b><br><img src="${q.src}"></div>${optionsHTML}`;
-                } else {
-                    preview.innerHTML += `<div class='question-container'><b>Q${index + 1}.</b> ${q.question}</div>${optionsHTML}`;
-                }
+        let cropper;
+        let cropIndex;
+        let dragSrcEl = null;
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup paper type change event
+            document.getElementById('paperType').addEventListener('change', function() {
+                toggleMCQOptions();
             });
-        }
-
-        function downloadPDF() {
-    const { jsPDF } = window.jspdf;
-    let pdf = new jsPDF("p", "mm", "a4");
-    let element = document.getElementById("question-preview");
-
-    // Convert the element to a canvas
-    html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-        let imgData = canvas.toDataURL("image/png");
-        let imgWidth = 190; // A4 width minus margins
-        let pageHeight = 297; // A4 height in mm
-        let imgHeight = (canvas.height * imgWidth) / canvas.width;
-        let heightLeft = imgHeight;
-        let position = 10; // Start position
-
-        // Add first page
-        pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-
-        // If content overflows, add new pages
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-        }
-
-        // Save PDF
-        pdf.save("question_paper.pdf");
-    });
-}
-
-
-
-        function downloadPNG() {
-            html2canvas(document.getElementById("question-preview"), { scale: 2 }).then(canvas => {
-                canvas.toBlob(blob => {
-                    saveAs(blob, "question_paper.png");
+            
+            // Setup file input change event
+            document.getElementById('file-input').addEventListener('change', handleFileUpload);
+            
+            // Setup tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
                 });
             });
+            
+            // Initialize
+            toggleMCQOptions();
+            updateStats();
+        });
+        
+        function toggleMCQOptions() {
+            const paperType = document.getElementById('paperType').value;
+            const mcqOptionsContainer = document.getElementById('mcq-options-container');
+            
+            if (paperType === 'mcq' || paperType === 'mixed') {
+                mcqOptionsContainer.style.display = 'block';
+            } else {
+                mcqOptionsContainer.style.display = 'none';
+            }
+        }
+        
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+            
+            // Special actions for tabs
+            if (tabId === 'questions') {
+                renderQuestionList();
+            } else if (tabId === 'preview') {
+                // Auto-generate preview when switching to preview tab
+                generateQuestionPaper();
+            }
+        }
+        
+        function addTextQuestion() {
+            const text = document.getElementById('text-question').value.trim();
+            const marks = parseInt(document.getElementById('question-marks').value) || 1;
+            
+            if (text === '') {
+                showNotification('Please enter a question', 'error');
+                return;
+            }
+            
+            const paperType = document.getElementById('paperType').value;
+            let question = {
+                type: 'text',
+                question: text,
+                marks: marks
+            };
+            
+            // Add MCQ options if applicable
+            if (paperType === 'mcq' || paperType === 'mixed') {
+                const options = [];
+                document.querySelectorAll('.mcq-option-input').forEach((input, index) => {
+                    const optionText = input.value.trim();
+                    if (optionText) {
+                        options.push({
+                            label: String.fromCharCode(65 + index), // A, B, C, D
+                            text: optionText
+                        });
+                    }
+                });
+                
+                const correctOption = document.getElementById('correct-option').value;
+                
+                if (options.length < 2) {
+                    showNotification('Please add at least two options for MCQ', 'error');
+                    return;
+                }
+                
+                question.options = options;
+                question.correctOption = correctOption;
+                question.isMCQ = true;
+            }
+            
+            questions.push(question);
+            
+            // Clear inputs
+            document.getElementById('text-question').value = '';
+            document.querySelectorAll('.mcq-option-input').forEach(input => {
+                input.value = '';
+            });
+            
+            // Update UI
+            renderQuestionList();
+            updateStats();
+            showNotification('Question added successfully');
+        }
+        
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+            
+            showLoading();
+            
+            let processedCount = 0;
+            const totalFiles = files.length;
+            
+            for (const file of files) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const marks = parseInt(document.getElementById('question-marks').value) || 1;
+                    
+                    questions.push({
+                        type: 'image',
+                        src: e.target.result,
+                        marks: marks
+                    });
+                    
+                    processedCount++;
+                    if (processedCount === totalFiles) {
+                        renderQuestionList();
+                        updateStats();
+                        hideLoading();
+                        showNotification(`Added ${totalFiles} image question(s) successfully`);
+                    }
+                };
+                
+                reader.onerror = function() {
+                    hideLoading();
+                    showNotification('Error reading file', 'error');
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // Reset file input
+            event.target.value = '';
+        }
+        
+        function renderQuestionList() {
+            const list = document.getElementById('question-list');
+            list.innerHTML = '';
+            
+            if (questions.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-dim);">No questions added yet. Add questions above.</p>';
+                return;
+            }
+            
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question-container');
+                questionDiv.setAttribute('data-index', index);
+                questionDiv.draggable = true;
+                
+                // Add drag and drop event listeners
+                questionDiv.addEventListener('dragstart', handleDragStart);
+                questionDiv.addEventListener('dragover', handleDragOver);
+                questionDiv.addEventListener('dragenter', handleDragEnter);
+                questionDiv.addEventListener('dragleave', handleDragLeave);
+                questionDiv.addEventListener('drop', handleDrop);
+                questionDiv.addEventListener('dragend', handleDragEnd);
+                
+                // Create button group
+                const btnGroup = document.createElement('div');
+                btnGroup.classList.add('btn-group');
+                
+                // Move button
+                const moveBtn = document.createElement('button');
+                moveBtn.innerHTML = '<i class="fas fa-grip-lines"></i>';
+                moveBtn.classList.add('action-btn', 'btn-move');
+                moveBtn.title = 'Drag to reorder';
+                
+                // Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.classList.add('action-btn', 'btn-delete');
+                deleteBtn.title = 'Delete question';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteQuestion(index);
+                };
+                
+                btnGroup.appendChild(moveBtn);
+                
+                // For image questions, add crop and rotate buttons
+                if (q.type === 'image') {
+                    const cropBtn = document.createElement('button');
+                    cropBtn.innerHTML = '<i class="fas fa-crop-alt"></i>';
+                    cropBtn.classList.add('action-btn', 'btn-crop');
+                    cropBtn.title = 'Crop image';
+                    cropBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        openCrop(q.src, index);
+                    };
+                    
+                    const rotateBtn = document.createElement('button');
+                    rotateBtn.innerHTML = '<i class="fas fa-redo"></i>';
+                    rotateBtn.classList.add('action-btn', 'btn-rotate');
+                    rotateBtn.title = 'Rotate image';
+                    rotateBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        rotateImage(index);
+                    };
+                    
+                    btnGroup.appendChild(cropBtn);
+                    btnGroup.appendChild(rotateBtn);
+                }
+                
+                btnGroup.appendChild(deleteBtn);
+                questionDiv.appendChild(btnGroup);
+                
+                // Question content
+                const contentDiv = document.createElement('div');
+                
+                if (q.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = q.src;
+                    img.alt = 'Question Image';
+                    contentDiv.appendChild(img);
+                } else {
+                    contentDiv.innerHTML = `<span class="question-number">Q${index + 1}.</span>
+                        <span class="question-text">${q.question}</span>
+                        <span class="question-marks">[${q.marks} mark${q.marks > 1 ? 's' : ''}]</span>`;
+                    
+                    // If it's an MCQ, display options
+                    if (q.isMCQ && q.options) {
+                        const optionsDiv = document.createElement('div');
+                        optionsDiv.classList.add('question-options');
+                        
+                        q.options.forEach(option => {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.classList.add('mcq-option');
+                            optionDiv.innerHTML = `<strong>${option.label})</strong> ${option.text}`;
+                            
+                            if (option.label === q.correctOption) {
+                                optionDiv.style.color = 'var(--success)';
+                                optionDiv.innerHTML += ' <i class="fas fa-check-circle"></i>';
+                            }
+                            
+                            optionsDiv.appendChild(optionDiv);
+                        });
+                        
+                        contentDiv.appendChild(optionsDiv);
+                    }
+                }
+                
+                questionDiv.appendChild(contentDiv);
+                list.appendChild(questionDiv);
+            });
+        }
+        
+        function deleteQuestion(index) {
+            if (confirm('Are you sure you want to delete this question?')) {
+                questions.splice(index, 1);
+                renderQuestionList();
+                updateStats();
+                showNotification('Question deleted');
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('question-count').textContent = questions.length;
+            
+            // Calculate total marks
+            let totalMarks = 0;
+            questions.forEach(q => {
+                totalMarks += q.marks || 0;
+            });
+            document.getElementById('total-marks').textContent = totalMarks;
+        }
+        
+        function openCrop(src, index) {
+            cropIndex = index;
+            
+            const image = document.getElementById('crop-image');
+            image.src = src;
+            
+            document.getElementById('crop-modal').style.display = 'flex';
+            
+            // Initialize cropper after image is loaded
+            image.onload = function() {
+                if (cropper) {
+                    cropper.destroy();
+                }
+                
+                cropper = new Cropper(image, {
+                    aspectRatio: NaN,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 0.8,
+                    zoomable: true,
+                    scalable: true,
+                    rotatable: true
+                });
+            };
+        }
+        
+        function saveCroppedImage() {
+            if (!cropper) return;
+            
+            const canvas = cropper.getCroppedCanvas({
+                maxWidth: 4096,
+                maxHeight: 4096,
+                fillColor: '#fff'
+            });
+            
+            if (canvas) {
+                questions[cropIndex].src = canvas.toDataURL('image/jpeg');
+                closeCrop();
+                renderQuestionList();
+                showNotification('Image cropped successfully');
+            }
+        }
+        
+        function closeCrop() {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            document.getElementById('crop-modal').style.display = 'none';
+        }
+        
+        function rotateImage(index) {
+            showLoading();
+            
+            const img = new Image();
+            img.src = questions[index].src;
+            
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set canvas dimensions for rotation
+                canvas.width = img.height;
+                canvas.height = img.width;
+                
+                // Translate and rotate
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(Math.PI / 2);
+                ctx.drawImage(img, -img.width / 2, -img.height / 2);
+                
+                // Update question source
+                questions[index].src = canvas.toDataURL('image/jpeg');
+                
+                renderQuestionList();
+                hideLoading();
+                showNotification('Image rotated successfully');
+            };
+            
+            img.onerror = function() {
+                hideLoading();
+                showNotification('Error rotating image', 'error');
+            };
+        }
+        
+        function generateQuestionPaper() {
+            const preview = document.getElementById('paper-preview');
+            const subject = document.getElementById('subject').value || 'Subject';
+            const chapter = document.getElementById('chapter').value || '';
+            const marks = document.getElementById('marks').value || 'XX';
+            const duration = document.getElementById('duration').value || '60 minutes';
+            const examDate = document.getElementById('examDate').value
+                ? new Date(document.getElementById('examDate').value).toLocaleDateString()
+                : new Date().toLocaleDateString();
+            const paperType = document.getElementById('paperType').value;
+            
+            if (questions.length === 0) {
+                showNotification('Please add at least one question', 'error');
+                switchTab('questions');
+                return;
+            }
+            
+            let paperHTML = `
+                <div class="paper-header">
+                    <div class="paper-title">SHREE SWAMINARAYAN GURUKUL SURAT</div>
+                    <div>${subject} ${chapter ? '- ' + chapter : ''}</div>
+                    <div>${paperType === 'mcq' ? 'Multiple Choice Questions' : 
+                          paperType === 'mixed' ? 'Mixed Format Question Paper' : 
+                          'Question Paper'}</div>
+                    <div class="paper-info">
+                        <div>Date: ${examDate}</div>
+                        <div class="paper-marks">Total Marks: ${marks}</div>
+                        <div class="paper-time">Time: ${duration}</div>
+                    </div>
+                </div>
+                <div class="paper-content">
+            `;
+            
+            // Generate questions
+            questions.forEach((q, index) => {
+                paperHTML += `<div class="paper-question">`;
+                
+                if (q.type === 'image') {
+                    paperHTML += `<img src="${q.src}" alt="Question ${index + 1}">`;
+                } else {
+                    paperHTML += `<div><b>Q${index + 1}.</b> ${q.question} <span style="float:right;">[${q.marks} mark${q.marks > 1 ? 's' : ''}]</span></div>`;
+                    
+                    // For MCQs, add options
+                    if (q.isMCQ && q.options) {
+                        q.options.forEach(option => {
+                            paperHTML += `<div class="mcq-option"><b>${option.label})</b> ${option.text}</div>`;
+                        });
+                    }
+                }
+                
+                paperHTML += `</div>`;
+            });
+            
+            paperHTML += `</div>`;
+            
+            preview.innerHTML = paperHTML;
+            preview.style.display = 'block';
+            showNotification('Question paper generated successfully');
+        }
+        
+        async function downloadPDF() {
+            if (questions.length === 0) {
+                showNotification('Please add at least one question', 'error');
+                switchTab('questions');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const subject = document.getElementById('subject').value || 'Subject';
+                const paperPreview = document.getElementById('paper-preview');
+                
+                // Make sure preview is generated
+                if (paperPreview.style.display !== 'block') {
+                    generateQuestionPaper();
+                }
+                
+                // Create PDF
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Convert HTML to canvas
+                const canvas = await html2canvas(paperPreview, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+                
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+                const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                const imgX = (pdfWidth - imgWidth * ratio) / 2;
+                const imgY = 10;
+                
+                pdf.addImage(imgData, 'JPEG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                pdf.save(`${subject.replace(/\s+/g, '_')}_QuestionPaper.pdf`);
+                
+                hideLoading();
+                showNotification('PDF downloaded successfully');
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                hideLoading();
+                showNotification('Error generating PDF', 'error');
+            }
+        }
+        
+        async function downloadPNG() {
+            if (questions.length === 0) {
+                showNotification('Please add at least one question', 'error');
+                switchTab('questions');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const subject = document.getElementById('subject').value || 'Subject';
+                const paperPreview = document.getElementById('paper-preview');
+                
+                // Make sure preview is generated
+                if (paperPreview.style.display !== 'block') {
+                    generateQuestionPaper();
+                }
+                
+                // Convert HTML to canvas
+                const canvas = await html2canvas(paperPreview, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+                
+                // Convert canvas to blob
+                canvas.toBlob(function(blob) {
+                    saveAs(blob, `${subject.replace(/\s+/g, '_')}_QuestionPaper.png`);
+                    hideLoading();
+                    showNotification('PNG downloaded successfully');
+                });
+            } catch (error) {
+                console.error('Error generating PNG:', error);
+                hideLoading();
+                showNotification('Error generating PNG', 'error');
+            }
+        }
+        
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.backgroundColor = type === 'success' ? 'var(--success)' : 'var(--danger)';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        // Drag and Drop functionality
+        function handleDragStart(e) {
+            this.classList.add('dragging');
+            dragSrcEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+        
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+        
+        function handleDragEnter(e) {
+            this.classList.add('over');
+        }
+        
+        function handleDragLeave(e) {
+            this.classList.remove('over');
+        }
+        
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            if (dragSrcEl !== this) {
+                const sourceIndex = parseInt(dragSrcEl.getAttribute('data-index'));
+                const targetIndex = parseInt(this.getAttribute('data-index'));
+                
+                // Reorder questions array
+                const temp = questions[sourceIndex];
+                
+                if (sourceIndex < targetIndex) {
+                    // Moving down
+                    for (let i = sourceIndex; i < targetIndex; i++) {
+                        questions[i] = questions[i + 1];
+                    }
+                } else {
+                    // Moving up
+                    for (let i = sourceIndex; i > targetIndex; i--) {
+                        questions[i] = questions[i - 1];
+                    }
+                }
+                
+                questions[targetIndex] = temp;
+                
+                // Re-render question list
+                renderQuestionList();
+                showNotification('Question reordered');
+            }
+            
+            return false;
+        }
+        
+        function handleDragEnd(e) {
+            document.querySelectorAll('.question-container').forEach(item => {
+                item.classList.remove('over', 'dragging');
+            });
+        }
+        
+        // Templates
+        function loadTemplate(template) {
+            switch (template) {
+                case 'unit_test':
+                    document.getElementById('subject').value = document.getElementById('subject').value || 'Science';
+                    document.getElementById('marks').value = '25';
+                    document.getElementById('duration').value = '45 minutes';
+                    document.getElementById('paperType').value = 'short';
+                    break;
+                    
+                case 'midterm':
+                    document.getElementById('subject').value = document.getElementById('subject').value || 'Mathematics';
+                    document.getElementById('marks').value = '50';
+                    document.getElementById('duration').value = '1 hour 30 minutes';
+                    document.getElementById('paperType').value = 'mixed';
+                    break;
+                    
+                case 'final':
+                    document.getElementById('subject').value = document.getElementById('subject').value || 'General Studies';
+                    document.getElementById('marks').value = '100';
+                    document.getElementById('duration').value = '3 hours';
+                    document.getElementById('paperType').value = 'mixed';
+                    break;
+                    
+                case 'quiz':
+                    document.getElementById('subject').value = document.getElementById('subject').value || 'General Knowledge';
+                    document.getElementById('marks').value = '10';
+                    document.getElementById('duration').value = '15 minutes';
+                    document.getElementById('paperType').value = 'mcq';
+                    break;
+            }
+            
+            toggleMCQOptions();
+            showNotification(`${template.replace('_', ' ')} template loaded`);
         }
     </script>
 </body>
